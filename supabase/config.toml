@@ -1,0 +1,4 @@
+project_id = "iwhhovqmmazwftkemczt"
+
+[functions.gerar-reforco]
+verify_jwt = false
