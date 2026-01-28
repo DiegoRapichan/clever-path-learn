@@ -3,6 +3,7 @@ import { Loader2, User } from "lucide-react";
 import { Header } from "@/components/Header";
 import { AvaliacaoForm } from "@/components/AvaliacaoForm";
 import { ReforcoDisplay } from "@/components/ReforcoDisplay";
+import { FeedbackReforco } from "@/components/FeedbackReforco";
 import { Historico } from "@/components/Historico";
 import { GraficoEvolucao } from "@/components/GraficoEvolucao";
 import { buscarUsuarioDemo, buscarHistorico, Avaliacao, Usuario } from "@/lib/api";
@@ -12,6 +13,8 @@ const Index = () => {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [avaliacoes, setAvaliacoes] = useState<Avaliacao[]>([]);
   const [reforcoAtual, setReforcoAtual] = useState<string | null>(null);
+  const [moduloAtual, setModuloAtual] = useState<string | null>(null);
+  const [mostrarFeedback, setMostrarFeedback] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   // Carregar usuário e histórico inicial
@@ -36,10 +39,25 @@ const Index = () => {
   }, []);
 
   // Callback quando uma avaliação é enviada
-  const handleAvaliacaoEnviada = async (reforco: string | null) => {
+  const handleAvaliacaoEnviada = async (reforco: string | null, modulo?: string) => {
     setReforcoAtual(reforco);
+    setModuloAtual(modulo || null);
+    setMostrarFeedback(!!reforco); // Mostra feedback apenas se gerou reforço
     
     // Recarregar histórico
+    if (usuario) {
+      const historico = await buscarHistorico(usuario.id);
+      setAvaliacoes(historico);
+    }
+  };
+
+  // Callback quando feedback é enviado
+  const handleFeedbackEnviado = async () => {
+    setMostrarFeedback(false);
+    setReforcoAtual(null);
+    setModuloAtual(null);
+    
+    // Recarregar histórico para atualizar o gráfico
     if (usuario) {
       const historico = await buscarHistorico(usuario.id);
       setAvaliacoes(historico);
@@ -94,6 +112,14 @@ const Index = () => {
             />
 
             {reforcoAtual && <ReforcoDisplay reforco={reforcoAtual} />}
+
+            {mostrarFeedback && moduloAtual && (
+              <FeedbackReforco
+                usuarioId={usuario.id}
+                modulo={moduloAtual}
+                onFeedbackEnviado={handleFeedbackEnviado}
+              />
+            )}
           </div>
 
           {/* Coluna direita - Histórico e Gráfico */}

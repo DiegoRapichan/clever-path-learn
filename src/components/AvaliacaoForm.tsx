@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 
 interface AvaliacaoFormProps {
   usuarioId: string;
-  onAvaliacaoEnviada: (reforco: string | null) => void;
+  onAvaliacaoEnviada: (reforco: string | null, modulo?: string) => void;
 }
 
 const MODULOS = [
@@ -83,7 +83,7 @@ export function AvaliacaoForm({ usuarioId, onAvaliacaoEnviada }: AvaliacaoFormPr
           title: "Avaliação enviada!",
           description: resultado.message,
         });
-        onAvaliacaoEnviada(resultado.reforco || null);
+        onAvaliacaoEnviada(resultado.reforco || null, moduloFinal);
         // Limpar formulário
         setModulo("");
         setModuloCustom("");
